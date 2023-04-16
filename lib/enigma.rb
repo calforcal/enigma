@@ -6,9 +6,7 @@ class Enigma
   end
 
   def encrypt(message, key, date)
-    split_message = message.split("")
-    encrypted_string = encrypt_message(split_message, key, date)
-
+    encrypted_string = encrypt_message(message, key, date)
     {
       encryption: "#{encrypted_string}",
       key: "#{key}",
@@ -40,11 +38,12 @@ class Enigma
     finals = key_generator(key).merge!(offset_generator(date)) { |key, key_value, offset_value| key_value + offset_value }
   end
 
-  def encrypt_message(array, key, date)
+  def encrypt_message(message, key, date)
+    split_message = message.split("")
     shift = final_shift(key, date)
     count = 0
-    array.map do |char|
-      if !@alphabet.include?(char)
+    split_message.map do |char|
+      if !@alphabet.include?(char.downcase)
         char
       elsif count == 0
         count += 1
@@ -71,7 +70,7 @@ class Enigma
         count += 1
         shift_d(char, shift[:"D"])
       end
-    end.join("")
+    end.join("").downcase
   end
 
   def get_value(num)
@@ -91,25 +90,25 @@ class Enigma
   end
 
   def shift_a(char, shift_key)
-    index = @alphabet.index(char)
+    index = @alphabet.index(char.downcase)
     shift_value = under_27(index, get_value(shift_key))
     @alphabet[shift_value]
   end
 
   def shift_b(char, shift_key)
-    index = @alphabet.index(char)
+    index = @alphabet.index(char.downcase)
     shift_value = under_27(index, get_value(shift_key))
     @alphabet[shift_value]
   end
 
   def shift_c(char, shift_key)
-    index = @alphabet.index(char)
+    index = @alphabet.index(char.downcase)
     shift_value = under_27(index, get_value(shift_key))
     @alphabet[shift_value]
   end
 
   def shift_d(char, shift_key)
-    index = @alphabet.index(char)
+    index = @alphabet.index(char.downcase)
     shift_value = under_27(index, get_value(shift_key))
     @alphabet[shift_value]
   end
