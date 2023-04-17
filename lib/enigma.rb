@@ -83,7 +83,7 @@ class Enigma
 
   def under_27(num1, num2)
     if num1 + num2 > 27
-      num1 + num2 - 27
+      (num1 + num2) % 27
     else
       num1 + num2
     end
@@ -112,4 +112,6 @@ class Enigma
     shift_value = under_27(index, get_value(shift_key))
     @alphabet[shift_value]
   end
+
+
 end
