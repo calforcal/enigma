@@ -58,11 +58,11 @@ RSpec.describe Enigma do
     end
   end
 
-  describe "#under_27" do
+  describe "#get_shift" do
     it "can return the needed shift value for a key and offset" do
-      expect(@enigma.under_27(2, 3)).to eq(5)
-      expect(@enigma.under_27(27, 5)).to eq(5)
-      expect(@enigma.under_27(25, 9)).to eq(7)
+      expect(@enigma.get_shift(2, 3)).to eq(5)
+      expect(@enigma.get_shift(27, 5)).to eq(5)
+      expect(@enigma.get_shift(25, 9)).to eq(7)
     end
   end
 
@@ -88,10 +88,10 @@ RSpec.describe Enigma do
 
   describe "#shift_a && b && c && d" do
     it "can shift a given value based on the key given" do
-      expect(@enigma.shift_a("a", 2)).to eq("c")
-      expect(@enigma.shift_b("b", 3)).to eq("e")
-      expect(@enigma.shift_c("c", 4)).to eq("g")
-      expect(@enigma.shift_d("d", 5)).to eq("i")
+      expect(@enigma.shift("a", 2)).to eq("c")
+      expect(@enigma.shift("b", 3)).to eq("e")
+      expect(@enigma.shift("c", 4)).to eq("g")
+      expect(@enigma.shift("d", 5)).to eq("i")
     end
   end
 
@@ -100,6 +100,26 @@ RSpec.describe Enigma do
       expect(@enigma.encrypt("hello world", "02715", "040895")).to eq(
         {
           encryption: "keder ohulw",
+          key: "02715",
+          date: "040895"
+        })
+    end
+  end
+
+  describe "#unshift_a && b && c && d" do
+    it "can unshift a given value based on the key given" do
+      expect(@enigma.unshift("c", 2)).to eq("a")
+      expect(@enigma.unshift("e", 3)).to eq("b")
+      expect(@enigma.unshift("g", 4)).to eq("c")
+      expect(@enigma.unshift("i", 5)).to eq("d")
+    end
+  end
+
+  describe "#decrypt" do
+    it "can decrypt a message when given the key and date" do
+      expect(@enigma.decrypt("keder ohulw", "02715", "040895")).to eq(
+        {
+          encryption: "hello world",
           key: "02715",
           date: "040895"
         })
