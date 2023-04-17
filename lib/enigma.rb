@@ -47,28 +47,28 @@ class Enigma
         char
       elsif count == 0
         count += 1
-        shift_a(char, shift[:"A"])
+        shift(char, shift[:"A"])
       elsif count == 1
         count += 1
-        shift_b(char, shift[:"B"])
+        shift(char, shift[:"B"])
       elsif count == 2
         count += 1
-        shift_c(char, shift[:"C"])
+        shift(char, shift[:"C"])
       elsif count == 3
         count += 1
-        shift_d(char, shift[:"D"])
+        shift(char, shift[:"D"])
       elsif count % 4 == 0
         count += 1
-        shift_a(char, shift[:"A"])
+        shift(char, shift[:"A"])
       elsif count % 4 == 1
         count += 1
-        shift_b(char, shift[:"B"])
+        shift(char, shift[:"B"])
       elsif count % 4 == 2
         count += 1
-        shift_c(char, shift[:"C"])
+        shift(char, shift[:"C"])
       elsif count % 4 == 3
         count += 1
-        shift_d(char, shift[:"D"])
+        shift(char, shift[:"D"])
       end
     end.join("").downcase
   end
@@ -81,35 +81,75 @@ class Enigma
     end
   end
 
-  def under_27(num1, num2)
+  def get_shift(num1, num2)
     if num1 + num2 > 27
-      num1 + num2 - 27
+      (num1 + num2) % 27
     else
       num1 + num2
     end
   end
 
-  def shift_a(char, shift_key)
+  def get_unshift(num1, num2)
+    if num1 - num2 < 0
+      ((num1 - num2) + 27).abs()
+    else
+      num1 - num2
+    end
+  end
+
+  def shift(char, shift_key)
     index = @alphabet.index(char.downcase)
-    shift_value = under_27(index, get_value(shift_key))
+    shift_value = get_shift(index, get_value(shift_key))
     @alphabet[shift_value]
   end
 
-  def shift_b(char, shift_key)
+  def unshift(char, shift_key)
     index = @alphabet.index(char.downcase)
-    shift_value = under_27(index, get_value(shift_key))
+    shift_value = get_unshift(index, get_value(shift_key))
     @alphabet[shift_value]
   end
 
-  def shift_c(char, shift_key)
-    index = @alphabet.index(char.downcase)
-    shift_value = under_27(index, get_value(shift_key))
-    @alphabet[shift_value]
+  def decrypt_message(message, key, date)
+    split_message = message.split("")
+    shift = final_shift(key, date)
+    count = 0
+    split_message.map do |char|
+      if !@alphabet.include?(char.downcase)
+        char
+      elsif count == 0
+        count += 1
+        unshift(char, shift[:"A"])
+      elsif count == 1
+        count += 1
+        unshift(char, shift[:"B"])
+      elsif count == 2
+        count += 1
+        unshift(char, shift[:"C"])
+      elsif count == 3
+        count += 1
+        unshift(char, shift[:"D"])
+      elsif count % 4 == 0
+        count += 1
+        unshift(char, shift[:"A"])
+      elsif count % 4 == 1
+        count += 1
+        unshift(char, shift[:"B"])
+      elsif count % 4 == 2
+        count += 1
+        unshift(char, shift[:"C"])
+      elsif count % 4 == 3
+        count += 1
+        unshift(char, shift[:"D"])
+      end
+    end.join("").downcase
   end
 
-  def shift_d(char, shift_key)
-    index = @alphabet.index(char.downcase)
-    shift_value = under_27(index, get_value(shift_key))
-    @alphabet[shift_value]
+  def decrypt(message, key, date)
+    decrypted_string = decrypt_message(message, key, date)
+    {
+      encryption: "#{decrypted_string}",
+      key: "#{key}",
+      date: "#{date}"
+    }
   end
 end
