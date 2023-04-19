@@ -12,6 +12,18 @@ RSpec.describe Enigma do
     it "initializes with an alphabet" do
       expect(@enigma.alphabet).to eq(["a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o", "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z", " "])
     end
+
+    it "initializes with a random 5 character number" do
+      expect(@enigma.key.length).to eq(5)
+    end
+  end
+
+  describe "#check_rand" do
+    it "checks if a random key is within the specified range" do
+      expect(@enigma.check_rand(@enigma.random_num)).to be(true)
+      expect(@enigma.check_rand(@enigma.random_num)).to be(true)
+      expect(@enigma.check_rand(@enigma.random_num)).to be(true)
+    end
   end
 
   describe "#key_generator" do
@@ -69,7 +81,7 @@ RSpec.describe Enigma do
   describe "#encrypt_message" do
     it "can encrypt the message and return it as a string" do
       expect(@enigma.encrypt_message("hello world", "02715", "040895")).to eq("keder ohulw")
-      expect(@enigma.encrypt_message("Michael Callahan", "02715", "040895")).to eq("pivdedtfdedhtg")
+      expect(@enigma.encrypt_message("Michael Callahan", "02715", "040895")).to eq("pivadedtfadedhtg")
     end
 
     it "can handle all uppercase" do
@@ -104,6 +116,22 @@ RSpec.describe Enigma do
           date: "040895"
         })
     end
+
+    it "can encrypt a message with todays date" do
+      expect(@enigma.encrypt("hello world", "02715")).to eq(
+        {
+          encryption: "rndiyiolauw",
+          key: "02715",
+          date: "190423"
+        })
+    end
+  end
+
+  describe "#get_unshift" do
+    it "can return the unshift value for a key and offset" do
+      expect(@enigma.get_unshift(27, 9)).to eq(18)
+      expect(@enigma.get_unshift(1, 8)).to eq(20)
+    end
   end
 
   describe "#unshift_a && b && c && d" do
@@ -115,6 +143,20 @@ RSpec.describe Enigma do
     end
   end
 
+  describe "#decrypt_message" do
+    it "can decrypt a message and return it as a string" do
+      expect(@enigma.decrypt_message("keder ohulw", "02715", "040895")).to eq("hello world")
+    end
+
+    it "can handle special characters" do
+      expect(@enigma.decrypt_message("!!keder. ohulw--?", "02715", "040895")).to eq("!!hello. world--?")
+    end
+
+    it "can decrypt with todays date" do
+      expect(@enigma.decrypt_message("wrvekndxmjdikqtk", "02715")).to eq("michael callahan")
+    end
+  end
+
   describe "#decrypt" do
     it "can decrypt a message when given the key and date" do
       expect(@enigma.decrypt("keder ohulw", "02715", "040895")).to eq(
@@ -122,6 +164,15 @@ RSpec.describe Enigma do
           encryption: "hello world",
           key: "02715",
           date: "040895"
+        })
+    end
+
+    it "can decrypt a message with todays date" do
+      expect(@enigma.decrypt("rndiyiolauw", "02715")).to eq(
+        {
+          encryption: "hello world",
+          key: "02715",
+          date: "190423"
         })
     end
   end
