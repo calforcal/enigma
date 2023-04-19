@@ -1,11 +1,30 @@
+require "date"
+
 class Enigma
-  attr_reader :alphabet
+  attr_reader :alphabet, :random_num, :key
 
   def initialize
     @alphabet = ("a".."z").to_a << " "
+    @date = Date.today
+    @formatted_date = @date.strftime("%d%m%y")
+    @random_num = rand(0..99999)
+    @key = format_key(@random_num)
   end
 
-  def encrypt(message, key, date)
+  def format_key(num)
+    string = num.to_s
+    if string.length < 5
+      string.rjust(5, "0")
+    else
+      string
+    end
+  end
+
+  def check_rand(num)
+    if num.to_i > 0 && num.to_i < 100000 then return true else return false end
+  end
+
+  def encrypt(message, key=@key, date=@formatted_date)
     encrypted_string = encrypt_message(message, key, date)
     {
       encryption: "#{encrypted_string}",
@@ -14,7 +33,7 @@ class Enigma
     }
   end
 
-  def key_generator(key)
+  def key_generator(key=@key)
     {
       "#{@alphabet[0].upcase}": key[0, 2].to_i,
       "#{@alphabet[1].upcase}": key[1, 2].to_i,
@@ -23,7 +42,7 @@ class Enigma
     }
   end
 
-  def offset_generator(date)
+  def offset_generator(date=@formatted_date)
     date_squared = date.to_i ** 2
     last_four = date_squared.to_s[-4, 4]
     {
@@ -34,11 +53,11 @@ class Enigma
     }
   end
 
-  def final_shift(key, date)
+  def final_shift(key=@key, date=@formatted_date)
     finals = key_generator(key).merge!(offset_generator(date)) { |key, key_value, offset_value| key_value + offset_value }
   end
 
-  def encrypt_message(message, key, date)
+  def encrypt_message(message, key=@key, date=@formatted_date)
     split_message = message.split("")
     shift = final_shift(key, date)
     count = 0
@@ -82,7 +101,7 @@ class Enigma
   end
 
   def get_shift(num1, num2)
-    if num1 + num2 > 27
+    if num1 + num2 >= 27
       (num1 + num2) % 27
     else
       num1 + num2
@@ -109,7 +128,7 @@ class Enigma
     @alphabet[shift_value]
   end
 
-  def decrypt_message(message, key, date)
+  def decrypt_message(message, key=@key, date=@formatted_date)
     split_message = message.split("")
     shift = final_shift(key, date)
     count = 0
@@ -144,7 +163,7 @@ class Enigma
     end.join("").downcase
   end
 
-  def decrypt(message, key, date)
+  def decrypt(message, key=@key, date=@formatted_date)
     decrypted_string = decrypt_message(message, key, date)
     {
       encryption: "#{decrypted_string}",
